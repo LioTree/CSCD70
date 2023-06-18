@@ -25,16 +25,17 @@
 define dso_local void @foo(i32 noundef %0) {
 ; CHECK-LABEL: define dso_local void @foo(i32 noundef %0) {
 ; @done(CSCD70) Please complete the CHECK directives.
-; CHECK-NEXT: %2 = mul nsw i32 %0, 16  
-; CHECK-NEXT: %3 = mul nsw i32 %2, %0
-; CHECK-NEXT: %4 = sdiv i32 %3, %0
-; CHECK-NEXT: %5 = sdiv i32 %3, 10
-; CHECK-NEXT: %6 = mul nsw i32 54, %4
-; CHECK-NEXT: %7 = sdiv i32 %5, 128
-; CHECK-NEXT: %8 = sdiv i32 %6, 54
-; CHECK-NEXT: %9 = sdiv i32 %5, 1
-; CHECK-NEXT: %10 = sub nsw i32 %8, 0
-; CHECK-NEXT: %11 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %0, i32 noundef %2, i32 noundef %3, i32 noundef %4, i32 noundef %5, i32 noundef %6, i32 noundef %7, i32 noundef %8, i32 noundef %9, i32 noundef %10)
+; CHECK-NEXT: %2 = add nsw i32 %0, 0
+; CHECK-NEXT: %3 = mul nsw i32 %0, 16  
+; CHECK-NEXT: %4 = mul nsw i32 %3, %0
+; CHECK-NEXT: %5 = sdiv i32 %4, %0
+; CHECK-NEXT: %6 = sdiv i32 %4, 10
+; CHECK-NEXT: %7 = mul nsw i32 54, %5
+; CHECK-NEXT: %8 = sdiv i32 %6, 128
+; CHECK-NEXT: %9 = sdiv i32 %7, 54
+; CHECK-NEXT: %10 = sdiv i32 %6, 1
+; CHECK-NEXT: %11 = sub nsw i32 %9, 0
+; CHECK-NEXT: %12 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %0, i32 noundef %3, i32 noundef %4, i32 noundef %5, i32 noundef %6, i32 noundef %7, i32 noundef %8, i32 noundef %9, i32 noundef %10, i32 noundef %11)
 ; CHECK-NEXT: ret void
   %2 = add nsw i32 %0, 0
   %3 = mul nsw i32 %2, 16

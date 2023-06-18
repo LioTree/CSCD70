@@ -9,7 +9,7 @@ PreservedAnalyses AlgebraicIdentityPass::run([[maybe_unused]] Function &F,
                                              FunctionAnalysisManager &) {
 
   /// @done(CSCD70) Please complete this method.
-  std::vector<Instruction *> instructionsToDelete;
+  // std::vector<Instruction *> instructionsToDelete;
   for (auto &B : F) {
     for (auto &I : B) {
       // 判断是否是加法指令
@@ -21,12 +21,12 @@ PreservedAnalyses AlgebraicIdentityPass::run([[maybe_unused]] Function &F,
         if (ConstantInt *constantInt = dyn_cast<ConstantInt>(op1)) {
           if (constantInt->isZero()) {
             I.replaceAllUsesWith(op2); // 将指令替换为op2
-            instructionsToDelete.push_back(&I);
+            // instructionsToDelete.push_back(&I);
           }
         } else if (ConstantInt *constantInt = dyn_cast<ConstantInt>(op2)) {
           if (constantInt->isZero()) {
             I.replaceAllUsesWith(op1); // 将指令替换为op1
-            instructionsToDelete.push_back(&I);
+            // instructionsToDelete.push_back(&I);
           }
         }
       }
@@ -39,20 +39,20 @@ PreservedAnalyses AlgebraicIdentityPass::run([[maybe_unused]] Function &F,
         if (ConstantInt *constantInt = dyn_cast<ConstantInt>(op1)) {
           if (constantInt->isOne()) {
             I.replaceAllUsesWith(op2); // 将指令替换为op2
-            instructionsToDelete.push_back(&I);
+            // instructionsToDelete.push_back(&I);
           }
         } else if (ConstantInt *constantInt = dyn_cast<ConstantInt>(op2)) {
           if (constantInt->isOne()) {
             I.replaceAllUsesWith(op1); // 将指令替换为op1
-            instructionsToDelete.push_back(&I);
+            // instructionsToDelete.push_back(&I);
           }
         }
       }
     }
   }
-  for (llvm::Instruction *I : instructionsToDelete) {
-    I->eraseFromParent(); // 从父节点中删除指令
-  }
+  // for (llvm::Instruction *I : instructionsToDelete) {
+  //   I->eraseFromParent(); // 从父节点中删除指令
+  // }
 
   return PreservedAnalyses::none();
 }
