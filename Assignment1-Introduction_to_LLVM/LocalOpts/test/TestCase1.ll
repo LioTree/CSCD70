@@ -26,7 +26,7 @@ define dso_local void @foo(i32 noundef %0) {
 ; CHECK-LABEL: define dso_local void @foo(i32 noundef %0) {
 ; @done(CSCD70) Please complete the CHECK directives.
 ; CHECK-NEXT: %2 = add nsw i32 %0, 0
-; CHECK-NEXT: %3 = mul nsw i32 %0, 16  
+; CHECK-NEXT: %3 = shl i32 %0, 4  
 ; CHECK-NEXT: %4 = mul nsw i32 %3, %0
 ; CHECK-NEXT: %5 = sdiv i32 %4, %0
 ; CHECK-NEXT: %6 = sdiv i32 %4, 10
