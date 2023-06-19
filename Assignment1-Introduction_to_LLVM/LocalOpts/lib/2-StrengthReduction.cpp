@@ -44,7 +44,7 @@ PreservedAnalyses StrengthReductionPass::run([[maybe_unused]] Function &F,
                 ConstantInt::getSigned(I.getType(), getPowerOfTwo(value));
             I.replaceAllUsesWith(
                 BinaryOperator::Create(Instruction::Shl, op2, new_value,
-                                       I.getOperand(3)->getName(), &I));
+                                       I.getName(), &I));
             instructionsToDelete.push_back(&I);
           }
         } else if (ConstantInt *constantInt = dyn_cast<ConstantInt>(op2)) {
@@ -54,7 +54,7 @@ PreservedAnalyses StrengthReductionPass::run([[maybe_unused]] Function &F,
                 ConstantInt::getSigned(I.getType(), getPowerOfTwo(value));
             I.replaceAllUsesWith(
                 BinaryOperator::Create(Instruction::Shl, op1, new_value,
-                                       I.getOperand(3)->getName(), &I));
+                                       I.getName(), &I));
             instructionsToDelete.push_back(&I);
           }
         }
