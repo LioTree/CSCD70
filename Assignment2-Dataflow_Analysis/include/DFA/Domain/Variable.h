@@ -19,14 +19,16 @@ struct Variable final : DomainBase<Variable> {
 
   bool contain(const llvm::Value *const Val) const final {
 
-    /// @todo(CSCD70) Please complete this method.
-
+    /// @done(CSCD70) Please complete this method.
+    if(Val == Var)
+      return true;
     return false;
   }
   Variable replaceValueWith(const llvm::Value *const SrcVal,
                             const llvm::Value *const DstVal) const final {
 
     /// @todo(CSCD70) Please complete this method.
+    // Still not sure what this function should does
 
     return *this;
   }
