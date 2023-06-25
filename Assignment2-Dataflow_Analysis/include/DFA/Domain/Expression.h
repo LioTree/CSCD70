@@ -63,8 +63,6 @@ struct Expression final : DomainBase<Expression> {
 
 llvm::raw_ostream &operator<<(llvm::raw_ostream &, const dfa::Expression &);
 
-size_t hash_combine( size_t lhs, size_t rhs );
-
 namespace std {
 
 template <> struct hash<::dfa::Expression> {
@@ -72,11 +70,7 @@ template <> struct hash<::dfa::Expression> {
     size_t HashVal = 0;
 
     /// @done(CSCD70) Please complete this method.
-    size_t lhs_hash = hash<const llvm::Value *>()(Expr.LHS);
-    size_t rhs_hash = hash<const llvm::Value *>()(Expr.RHS);
-    HashVal = hash_combine(Expr.Opcode,lhs_hash);
-    HashVal = hash_combine(HashVal,rhs_hash);
-
+    hashCombine<unsigned,const llvm::Value *,const llvm::Value *>(&HashVal, Expr.Opcode, Expr.LHS, Expr.RHS);
     return HashVal;
   }
 };
