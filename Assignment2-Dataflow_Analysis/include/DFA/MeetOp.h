@@ -33,9 +33,9 @@ template <typename TValue> struct Intersect final : MeetOpBase<TValue> {
   }
   DomainVal_t top(const std::size_t DomainSize) const final {
 
-    /// @todo(CSCD70) Please complete this method.
+    /// @done(CSCD70) Please complete this method.
 
-    return DomainVal_t(DomainSize);
+    return DomainVal_t(DomainSize,TValue::top());
   }
 };
 

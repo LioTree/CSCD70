@@ -71,8 +71,9 @@ protected:
   DomainVal_t getBoundaryVal(const llvm::BasicBlock &BB) const {
     MeetOperands_t MeetOperands = getMeetOperands(BB);
 
-    /// @todo(CSCD70) Please complete this method.
-
+    /// @done(CSCD70) Please complete this method.
+    // I am not sure what this method should do, but I guess its purpose is getting the result of meet operator.
+    // It seems that I don't need more code.
     return meet(MeetOperands);
   }
   /// @brief Get the list of basic blocks to which the meet operator will be
@@ -89,16 +90,21 @@ protected:
   virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
     MeetOperands_t Operands;
 
-    /// @todo(CSCD70) Please complete this method.
-
+    /// @done(CSCD70) Please complete this method.
+    MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
+    for (const llvm::BasicBlock *BB : MeetBBConstRange)
+      Operands.push_back(BVs.at(BB));
     return Operands;
   }
   DomainVal_t bc() const { return DomainVal_t(DomainIdMap.size()); }
   DomainVal_t meet(const MeetOperands_t &MeetOperands) const {
 
-    /// @todo(CSCD70) Please complete this method.
-
-    return DomainVal_t(DomainIdMap.size());
+    /// @done(CSCD70) Please complete this method.
+    TMeetOp meetOp;
+    DomainVal_t result = meetOp.top(DomainIdMap.size());
+    for(const auto &Op : MeetOperands)
+      result = meetOp(Op, result);
+    return result;
   }
 
   /// @}
