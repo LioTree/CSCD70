@@ -1,6 +1,7 @@
 #pragma once // NOLINT(llvm-header-guard)
 
 #include <vector>
+#include <algorithm>
 
 namespace dfa {
 
@@ -25,9 +26,10 @@ template <typename TValue> struct Intersect final : MeetOpBase<TValue> {
   DomainVal_t operator()(const DomainVal_t &LHS,
                          const DomainVal_t &RHS) const final {
 
-    /// @todo(CSCD70) Please complete this method.
-
-    return LHS;
+    /// @done(CSCD70) Please complete this method.
+    DomainVal_t result;
+    std::set_intersection(LHS.begin(), LHS.end(), RHS.begin(), RHS.end(), std::back_inserter(result));
+    return result;
   }
   DomainVal_t top(const std::size_t DomainSize) const final {
 
