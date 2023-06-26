@@ -14,5 +14,10 @@ raw_ostream &operator<<(raw_ostream &Outs, const Expression &Expr) {
 
 void Expression::Initializer::visitBinaryOperator(BinaryOperator &BO) {
 
-  /// @todo(CSCD70) Please complete this method.
+  /// @done(CSCD70) Please complete this method.
+  Expression expr{BO}; 
+  if(DomainIdMap.find(&expr) == DomainIdMap.end()) {
+    DomainVector.push_back(expr);
+    DomainIdMap.insert(std::make_pair(expr, DomainVector.size() - 1));
+  }
 }

@@ -72,8 +72,8 @@ protected:
     MeetOperands_t MeetOperands = getMeetOperands(BB);
 
     /// @done(CSCD70) Please complete this method.
-    // I am not sure what this method should do, but I guess its purpose is getting the result of meet operator.
-    // It seems that I don't need more code.
+    if(MeetOperands.begin() == MeetOperands.end())
+      return bc();
     return meet(MeetOperands);
   }
   /// @brief Get the list of basic blocks to which the meet operator will be
@@ -128,7 +128,14 @@ protected:
   bool traverseCFG(const llvm::Function &F) {
     bool Changed = false;
 
-    /// @todo(CSCD70) Please complete this method.
+    /// @done(CSCD70) Please complete this method.
+    for (const auto &BB : getBBConstRange(F)) {
+      DomainVal_t IDV = getBoundaryVal(BB);
+      for (const auto &Inst : getInstConstRange(BB)) {
+        Changed |= transferFunc(Inst, IDV, InstDomainValMap.at(&Inst));
+        IDV = InstDomainValMap.at(&Inst);
+      }
+    }
 
     return Changed;
   }
@@ -149,7 +156,13 @@ protected:
   virtual AnalysisResult_t run(llvm::Function &F,
                                llvm::FunctionAnalysisManager &FAM) {
 
-    /// @todo(CSCD70) Please complete this method.
+    /// @done(CSCD70) Please complete this method.
+    typename TDomainElem::Initializer init{DomainIdMap, DomainVector};
+    init.visit(F); 
+    for(auto &Inst : llvm::instruction(F)) 
+      InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
+    while(traverseCFG(F))
+      ;
 
     return std::make_tuple(DomainIdMap, DomainVector, BVs, InstDomainValMap);
   }
