@@ -4,6 +4,7 @@
 #include <llvm/IR/InstIterator.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/Support/raw_ostream.h>
+#include <iostream>
 
 #include <tuple>
 namespace dfa {
@@ -72,8 +73,9 @@ protected:
     MeetOperands_t MeetOperands = getMeetOperands(BB);
 
     /// @done(CSCD70) Please complete this method.
-    if(MeetOperands.begin() == MeetOperands.end())
+    if(MeetOperands.begin() == MeetOperands.end()) {
       return bc();
+    }
     return meet(MeetOperands);
   }
   /// @brief Get the list of basic blocks to which the meet operator will be
@@ -92,8 +94,9 @@ protected:
 
     /// @done(CSCD70) Please complete this method.
     MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
-    for (const llvm::BasicBlock *BB : MeetBBConstRange)
-      Operands.push_back(BVs.at(BB));
+    for (const llvm::BasicBlock *BB : MeetBBConstRange) {
+      Operands.push_back(InstDomainValMap.at(&(BB->back())));
+    }
     return Operands;
   }
   DomainVal_t bc() const { return DomainVal_t(DomainIdMap.size()); }
@@ -134,6 +137,7 @@ protected:
       for (const auto &Inst : getInstConstRange(BB)) {
         Changed |= transferFunc(Inst, IDV, InstDomainValMap.at(&Inst));
         IDV = InstDomainValMap.at(&Inst);
+        printInstDomainValMap(Inst);
       }
     }
 
@@ -159,8 +163,11 @@ protected:
     /// @done(CSCD70) Please complete this method.
     typename TDomainElem::Initializer init{DomainIdMap, DomainVector};
     init.visit(F); 
-    for(auto &Inst : llvm::instruction(F)) 
-      InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
+    for(llvm::BasicBlock &BB : F) {
+      for(llvm::Instruction &Inst : BB) {
+        InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
+      }
+    }
     while(traverseCFG(F))
       ;
 
@@ -181,6 +188,9 @@ struct Bool {
   }
   Bool operator|(const Bool &Other) const {
     return {.Value = Value || Other.Value};
+  }
+  bool operator==(const Bool &other) const {
+    return this->Value == other.Value;
   }
   static Bool top() { return {.Value = true}; }
   explicit operator bool() const { return Value; }

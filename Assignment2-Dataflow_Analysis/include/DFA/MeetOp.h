@@ -27,8 +27,11 @@ template <typename TValue> struct Intersect final : MeetOpBase<TValue> {
                          const DomainVal_t &RHS) const final {
 
     /// @done(CSCD70) Please complete this method.
-    DomainVal_t result;
-    std::set_intersection(LHS.begin(), LHS.end(), RHS.begin(), RHS.end(), std::back_inserter(result));
+    DomainVal_t result = DomainVal_t(LHS.size());
+    for(std::size_t i = 0; i < LHS.size(); i++) {
+      if(LHS[i] & RHS[i])
+        result[i] = TValue::top();
+    }
     return result;
   }
   DomainVal_t top(const std::size_t DomainSize) const final {
