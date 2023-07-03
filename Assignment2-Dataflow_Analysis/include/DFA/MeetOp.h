@@ -42,6 +42,23 @@ template <typename TValue> struct Intersect final : MeetOpBase<TValue> {
   }
 };
 
-/// @todo(CSCD70) Please add another subclass for the Union meet operator.
+/// @done(CSCD70) Please add another subclass for the Union meet operator.
+template <typename TValue> struct Union final : MeetOpBase<TValue> {
+  using DomainVal_t = typename MeetOpBase<TValue>::DomainVal_t;
+
+  DomainVal_t operator()(const DomainVal_t &LHS,
+                         const DomainVal_t &RHS) const final {
+
+    DomainVal_t result = DomainVal_t(LHS.size());
+    for(std::size_t i = 0; i < LHS.size(); i++) {
+      if(LHS[i] | RHS[i])
+        result[i] = TValue::top();
+    }
+    return result;
+  }
+  DomainVal_t top(const std::size_t DomainSize) const final {
+    return DomainVal_t(DomainSize);
+  }
+};
 
 } // namespace dfa
