@@ -3,7 +3,9 @@
 #include "4-LCM/LCM.h"
 
 #include <DFA/Domain/Expression.h>
+#include <DFA/Domain/Variable.h>
 #include <DFA/Flow/ForwardAnalysis.h>
+#include <DFA/Flow/BackwardAnalysis.h>
 #include <DFA/MeetOp.h>
 
 #include <llvm/IR/PassManager.h>
@@ -37,7 +39,26 @@ public:
   }
 };
 
-/// @todo(CSCD70) Please complete the main body of the following passes, similar
+class Liveness final : public dfa::BackwardAnalysis<dfa::Variable, dfa::Bool,
+                                                     dfa::Union<dfa::Bool>>,
+                         public llvm::AnalysisInfoMixin<Liveness> {
+private:
+  using BackwardAnalysis_t = dfa::BackwardAnalysis<dfa::Variable, dfa::Bool,
+                                                 dfa::Union<dfa::Bool>>;
+
+  friend llvm::AnalysisInfoMixin<Liveness>;
+  static llvm::AnalysisKey Key;
+
+  std::string getName() const final { return "Liveness"; }
+  bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
+                    DomainVal_t &) final;
+
+public:
+  using Result = typename BackwardAnalysis_t::AnalysisResult_t;
+  using BackwardAnalysis_t::run;
+};
+
+/// @done(CSCD70) Please complete the main body of the following passes, similar
 ///               to the Available Expressions pass above.
 
 class LivenessWrapperPass : public llvm::PassInfoMixin<LivenessWrapperPass> {
@@ -45,8 +66,7 @@ public:
   llvm::PreservedAnalyses run(llvm::Function &F,
                               llvm::FunctionAnalysisManager &FAM) {
 
-    /// @todo(CSCD70) Get the result from the main body.
-
+    FAM.getResult<Liveness>(F);
     return llvm::PreservedAnalyses::all();
   }
 };

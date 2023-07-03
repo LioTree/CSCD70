@@ -8,11 +8,11 @@ bool AvailExprs::transferFunc(const Instruction &Inst, const DomainVal_t &IDV,
                              DomainVal_t &ODV) {
 
   /// @done(CSCD70) Please complete this method.
-  // IN - kill
   const llvm::BinaryOperator* BO = llvm::dyn_cast<const llvm::BinaryOperator>(&Inst);
   DomainVal_t TDV = IDV;
   if(BO) {
     for(std::size_t i = 0; i < TDV.size(); i++) {
+      // IN - kill
       if(DomainVector[i].contain(&Inst)) {
         TDV[i] = TDV[i] & dfa::Bool();
       }

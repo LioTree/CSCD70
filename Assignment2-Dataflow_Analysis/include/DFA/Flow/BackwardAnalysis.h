@@ -1,6 +1,7 @@
 #pragma once // NOLINT(llvm-header-guard)
 
 #include "Framework.h"
+#include "llvm/IR/SymbolTableListTraits.h"
 
 /// @done(CSCD70) Please instantiate for the backward pass, similar to the
 ///               forward one.
@@ -10,7 +11,7 @@ namespace dfa {
 
 typedef llvm::iterator_range<llvm::const_succ_iterator>
     BackwardMeetBBConstRange_t;
-typedef llvm::iterator_range<llvm::Function::const_reverse_iterator>
+typedef llvm::iterator_range<std::reverse_iterator<llvm::Function::const_iterator>>
     BackwardBBConstRange_t;
 typedef llvm::iterator_range<llvm::BasicBlock::const_reverse_iterator>
     BackwardInstConstRange_t;
@@ -27,6 +28,7 @@ protected:
   using typename Framework_t::BBConstRange_t;
   using typename Framework_t::InstConstRange_t;
   using typename Framework_t::MeetBBConstRange_t;
+  using typename Framework_t::MeetOperands_t;
 
   using Framework_t::BVs;
   using Framework_t::DomainIdMap;
@@ -46,11 +48,11 @@ protected:
     outs() << Inst << "\n";
     LOG_ANALYSIS_INFO << "\t"
                       << stringifyDomainWithMask(InstDomainValMap.at(&Inst));
-    if (&Inst == &(ParentBB->front())) {
+    if (&Inst == &(ParentBB->back())) {
       errs() << "\n";
       // LOG_ANALYSIS_INFO << "\t" << stringifyDomainWithMask(BVs.at(ParentBB));
       LOG_ANALYSIS_INFO << "\t" << stringifyDomainWithMask(getBoundaryVal(*ParentBB));
-    } // if (&Inst == &(*ParentBB->begin()))
+    } // if (&Inst == &(*ParentBB->back()))
   }
 
   MeetBBConstRange_t
@@ -61,7 +63,17 @@ protected:
     return make_range(BB.rbegin(), BB.rend());
   }
   BBConstRange_t getBBConstRange(const llvm::Function &F) const final {
-    return make_range(F.rbegin(), F.rend());
+    return llvm::reverse(F);
+  }
+  MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
+    MeetOperands_t Operands;
+
+    /// @done(CSCD70) Please complete this method.
+    MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
+    for (const llvm::BasicBlock *BB : MeetBBConstRange) {
+      Operands.push_back(InstDomainValMap.at(&(BB->front())));
+    }
+    return Operands;
   }
 };
 

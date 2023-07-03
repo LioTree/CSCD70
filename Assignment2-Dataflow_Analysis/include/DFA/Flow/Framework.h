@@ -89,16 +89,7 @@ protected:
   /// @param BB
   /// @return
   /// @sa @c getMeetBBConstRange
-  virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
-    MeetOperands_t Operands;
-
-    /// @done(CSCD70) Please complete this method.
-    MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
-    for (const llvm::BasicBlock *BB : MeetBBConstRange) {
-      Operands.push_back(InstDomainValMap.at(&(BB->back())));
-    }
-    return Operands;
-  }
+  virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const = 0;
   DomainVal_t bc() const { return DomainVal_t(DomainIdMap.size()); }
   DomainVal_t meet(const MeetOperands_t &MeetOperands) const {
 
@@ -135,9 +126,21 @@ protected:
     for (const auto &BB : getBBConstRange(F)) {
       DomainVal_t IDV = getBoundaryVal(BB);
       for (const auto &Inst : getInstConstRange(BB)) {
+        // llvm::outs() << "\tIDV: ";
+        // for(auto &Val : IDV)
+        //   llvm::outs() << Val.Value << ", ";
+        // llvm::outs() << "\n";
+        // llvm::outs() << Inst << "\n";
+
         Changed |= transferFunc(Inst, IDV, InstDomainValMap.at(&Inst));
         IDV = InstDomainValMap.at(&Inst);
-        printInstDomainValMap(Inst);
+
+        // llvm::outs() << "\tODV: ";
+        // for(auto &Val : InstDomainValMap.at(&Inst))
+        //   llvm::outs() << Val.Value << ", ";
+        // llvm::outs() << "\n\n";
+
+        // printInstDomainValMap(Inst);
       }
     }
 
@@ -168,8 +171,11 @@ protected:
         InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
       }
     }
+    // traverseCFG(F);
     while(traverseCFG(F))
       ;
+    printInstDomainValMap(F);
+    llvm::outs() << "---------------------------\n";
 
     return std::make_tuple(DomainIdMap, DomainVector, BVs, InstDomainValMap);
   }

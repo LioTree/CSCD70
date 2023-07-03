@@ -25,6 +25,7 @@ protected:
   using typename Framework_t::BBConstRange_t;
   using typename Framework_t::InstConstRange_t;
   using typename Framework_t::MeetBBConstRange_t;
+  using typename Framework_t::MeetOperands_t;
 
   using Framework_t::BVs;
   using Framework_t::DomainIdMap;
@@ -60,6 +61,16 @@ protected:
   }
   BBConstRange_t getBBConstRange(const llvm::Function &F) const final {
     return make_range(F.begin(), F.end());
+  }
+  MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
+    MeetOperands_t Operands;
+
+    /// @done(CSCD70) Please complete this method.
+    MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
+    for (const llvm::BasicBlock *BB : MeetBBConstRange) {
+      Operands.push_back(InstDomainValMap.at(&(BB->back())));
+    }
+    return Operands;
   }
 };
 

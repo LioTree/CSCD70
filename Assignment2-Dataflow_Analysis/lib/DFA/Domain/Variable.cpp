@@ -12,9 +12,13 @@ raw_ostream &operator<<(raw_ostream &Outs, const Variable &Var) {
 void Variable::Initializer::visitInstruction(Instruction &I) {
 
   /// @done(CSCD70) Please complete this method.
-  Variable var{I};
-  if(DomainIdMap.find(var) == DomainIdMap.end()) {
-    DomainVector.push_back(var);
-    DomainIdMap.insert(std::make_pair(var, DomainVector.size() - 1));
+  for(const auto &Op : I.operands()) {
+    if (isa<Instruction>(Op) || isa<Argument>(Op)) {
+      Variable var{Op};
+      if(DomainIdMap.find(var) == DomainIdMap.end()) {
+        DomainVector.push_back(var);
+        DomainIdMap.insert(std::make_pair(var, DomainVector.size() - 1));
+      }
+    }
   }
 }
