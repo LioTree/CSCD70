@@ -1,10 +1,10 @@
 #pragma once // NOLINT(llvm-header-guard)
 
+#include <iostream>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/InstIterator.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/Support/raw_ostream.h>
-#include <iostream>
 
 #include <tuple>
 namespace dfa {
@@ -73,7 +73,7 @@ protected:
     MeetOperands_t MeetOperands = getMeetOperands(BB);
 
     /// @done(CSCD70) Please complete this method.
-    if(MeetOperands.begin() == MeetOperands.end()) {
+    if (MeetOperands.begin() == MeetOperands.end()) {
       return bc();
     }
     return meet(MeetOperands);
@@ -96,7 +96,7 @@ protected:
     /// @done(CSCD70) Please complete this method.
     TMeetOp meetOp;
     DomainVal_t result = meetOp.top(DomainIdMap.size());
-    for(const auto &Op : MeetOperands)
+    for (const auto &Op : MeetOperands)
       result = meetOp(Op, result);
     return result;
   }
@@ -165,14 +165,14 @@ protected:
 
     /// @done(CSCD70) Please complete this method.
     typename TDomainElem::Initializer init{DomainIdMap, DomainVector};
-    init.visit(F); 
-    for(llvm::BasicBlock &BB : F) {
-      for(llvm::Instruction &Inst : BB) {
+    init.visit(F);
+    for (llvm::BasicBlock &BB : F) {
+      for (llvm::Instruction &Inst : BB) {
         InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
       }
     }
     // traverseCFG(F);
-    while(traverseCFG(F))
+    while (traverseCFG(F))
       ;
     printInstDomainValMap(F);
     llvm::outs() << "---------------------------\n";
@@ -200,6 +200,40 @@ struct Bool {
   }
   static Bool top() { return {.Value = true}; }
   explicit operator bool() const { return Value; }
+};
+
+#define UNDEF 0
+#define SC 1
+#define NAC 2
+
+struct Constant
+{
+  int Value = 0;
+  int ConstantType = UNDEF;
+
+  Constant operator&(const Constant &Other) const
+  {
+    if (ConstantType == NAC || Other.ConstantType == NAC)
+      return {.ConstantType = NAC};
+    if (ConstantType == UNDEF)
+      return {.Value = Other.Value, .ConstantType = Other.ConstantType};
+    else if (Other.ConstantType == UNDEF)
+      return {.Value = Value, .ConstantType = ConstantType};
+    else
+      if(Value == Other.Value)
+        return {.Value = Value, .ConstantType = SC};
+      else
+        return {.ConstantType = NAC};
+  }
+
+  bool operator==(const Constant &other) const
+  {
+    if (ConstantType == other.ConstantType)
+      return (ConstantType == SC && Value != other.Value) ? false : true;
+    return false;
+  }
+
+  static Constant top() { return {}; }
 };
 
 } // namespace dfa
