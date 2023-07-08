@@ -29,8 +29,7 @@ template <typename TValue> struct Intersect final : MeetOpBase<TValue> {
     /// @done(CSCD70) Please complete this method.
     DomainVal_t result = DomainVal_t(LHS.size());
     for(std::size_t i = 0; i < LHS.size(); i++) {
-      if(LHS[i] & RHS[i])
-        result[i] = TValue::top();
+      result[i] = LHS[i] & RHS[i];
     }
     return result;
   }
@@ -51,8 +50,7 @@ template <typename TValue> struct Union final : MeetOpBase<TValue> {
 
     DomainVal_t result = DomainVal_t(LHS.size());
     for(std::size_t i = 0; i < LHS.size(); i++) {
-      if(LHS[i] | RHS[i])
-        result[i] = TValue::top();
+      result[i] = LHS[i] | RHS[i];
     }
     return result;
   }
