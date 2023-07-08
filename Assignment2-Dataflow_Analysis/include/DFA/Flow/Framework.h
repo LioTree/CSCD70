@@ -202,9 +202,9 @@ struct Bool {
   explicit operator bool() const { return Value; }
 };
 
-#define UNDEF 0
-#define SC 1
-#define NAC 2
+const int UNDEF = 0;
+const int SC = 1;
+const int NAC = 2;
 
 struct Constant
 {
