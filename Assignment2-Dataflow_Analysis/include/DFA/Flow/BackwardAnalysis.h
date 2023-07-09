@@ -11,7 +11,8 @@ namespace dfa {
 
 typedef llvm::iterator_range<llvm::const_succ_iterator>
     BackwardMeetBBConstRange_t;
-typedef llvm::iterator_range<std::reverse_iterator<llvm::Function::const_iterator>>
+typedef llvm::iterator_range<
+    std::reverse_iterator<llvm::Function::const_iterator>>
     BackwardBBConstRange_t;
 typedef llvm::iterator_range<llvm::BasicBlock::const_reverse_iterator>
     BackwardInstConstRange_t;
@@ -26,6 +27,7 @@ protected:
                 BackwardBBConstRange_t, BackwardInstConstRange_t>;
   using typename Framework_t::AnalysisResult_t;
   using typename Framework_t::BBConstRange_t;
+  using typename Framework_t::DomainVal_t;
   using typename Framework_t::InstConstRange_t;
   using typename Framework_t::MeetBBConstRange_t;
   using typename Framework_t::MeetOperands_t;
@@ -44,14 +46,15 @@ protected:
     using llvm::errs;
     using llvm::outs;
     const llvm::BasicBlock *const ParentBB = Inst.getParent();
- 
+
     outs() << Inst << "\n";
     LOG_ANALYSIS_INFO << "\t"
                       << stringifyDomainWithMask(InstDomainValMap.at(&Inst));
     if (&Inst == &(ParentBB->back())) {
       errs() << "\n";
       // LOG_ANALYSIS_INFO << "\t" << stringifyDomainWithMask(BVs.at(ParentBB));
-      LOG_ANALYSIS_INFO << "\t" << stringifyDomainWithMask(getBoundaryVal(*ParentBB));
+      LOG_ANALYSIS_INFO << "\t"
+                        << stringifyDomainWithMask(getBoundaryVal(*ParentBB));
     } // if (&Inst == &(*ParentBB->back()))
   }
 
@@ -65,13 +68,35 @@ protected:
   BBConstRange_t getBBConstRange(const llvm::Function &F) const final {
     return llvm::reverse(F);
   }
+  // this method should be in Liveness, but it's more convenient to put it here
   MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
     MeetOperands_t Operands;
 
-    /// @done(CSCD70) Please complete this method.
     MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
-    for (const llvm::BasicBlock *BB : MeetBBConstRange) {
-      Operands.push_back(InstDomainValMap.at(&(BB->front())));
+    for (const llvm::BasicBlock *MeetBB : MeetBBConstRange) {
+      DomainVal_t DV = InstDomainValMap.at(&(MeetBB->front()));
+
+      /*
+      phi instructions requires special consideration.
+      For example, in 2-Liveness.ll:
+        BB3 has two predecessors(BB2 and BB7), and it has two phi instructions:
+          %.01 = phi i32 [ 1, %2 ], [ %6, %7 ]
+          %.0 = phi i32 [ %0, %2 ], [ %8, %7 ]
+        which means if %0 is alive in INPUT[BB3], this information should only be propagated to BB2 instead of BB7.
+        similarly, if %6 is alive in INPUT[BB3], this information should only be propagated to BB7 instead of BB2.
+      */
+      for (auto &phi : MeetBB->phis()) {
+        for (auto &phiIncomingBlock : phi.blocks()) {
+
+          if (&BB != phiIncomingBlock) {
+            auto it = std::find(DomainVector.begin(), DomainVector.end(),
+                                phi.getIncomingValueForBlock(phiIncomingBlock));
+            int index = std::distance(DomainVector.begin(), it);
+            DV[index] = DV[index] & TValue();
+          }
+        }
+      }
+      Operands.push_back(DV);
     }
     return Operands;
   }

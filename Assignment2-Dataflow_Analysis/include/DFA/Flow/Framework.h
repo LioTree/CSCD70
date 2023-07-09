@@ -171,7 +171,6 @@ protected:
         InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
       }
     }
-    // traverseCFG(F);
     while (traverseCFG(F))
       ;
     printInstDomainValMap(F);
