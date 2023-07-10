@@ -11,10 +11,10 @@ bool AvailExprs::transferFunc(const Instruction &Inst, const DomainVal_t &IDV,
   const llvm::BinaryOperator* BO = llvm::dyn_cast<const llvm::BinaryOperator>(&Inst);
   DomainVal_t TDV = IDV;
   if(BO) {
-    for(std::size_t i = 0; i < TDV.size(); i++) {
+    for(std::size_t I = 0; I < TDV.size(); I++) {
       // IN - kill
-      if(DomainVector[i].contain(&Inst)) {
-        TDV[i] = TDV[i] & dfa::Bool();
+      if(DomainVector[I].contain(&Inst)) {
+        TDV[I] = TDV[I] & dfa::Bool();
       }
     }
     // GEN

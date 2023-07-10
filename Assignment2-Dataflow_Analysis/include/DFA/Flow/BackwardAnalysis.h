@@ -85,14 +85,14 @@ protected:
         which means if %0 is alive in INPUT[BB3], this information should only be propagated to BB2 instead of BB7.
         similarly, if %6 is alive in INPUT[BB3], this information should only be propagated to BB7 instead of BB2.
       */
-      for (auto &phi : MeetBB->phis()) {
-        for (auto &phiIncomingBlock : phi.blocks()) {
+      for (auto &Phi : MeetBB->phis()) {
+        for (auto &PhiIncomingBlock : Phi.blocks()) {
 
-          if (&BB != phiIncomingBlock) {
-            auto it = std::find(DomainVector.begin(), DomainVector.end(),
-                                phi.getIncomingValueForBlock(phiIncomingBlock));
-            int index = std::distance(DomainVector.begin(), it);
-            DV[index] = DV[index] & TValue();
+          if (&BB != PhiIncomingBlock) {
+            auto It = std::find(DomainVector.begin(), DomainVector.end(),
+                                Phi.getIncomingValueForBlock(PhiIncomingBlock));
+            int Index = std::distance(DomainVector.begin(), It);
+            DV[Index] = DV[Index] & TValue();
           }
         }
       }

@@ -1,10 +1,10 @@
 #pragma once // NOLINT(llvm-header-guard)
 
-#include <iostream>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/InstIterator.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/Support/raw_ostream.h>
+#include <iostream>
 
 #include <tuple>
 namespace dfa {
@@ -94,11 +94,11 @@ protected:
   DomainVal_t meet(const MeetOperands_t &MeetOperands) const {
 
     /// @done(CSCD70) Please complete this method.
-    TMeetOp meetOp;
-    DomainVal_t result = meetOp.top(DomainIdMap.size());
+    TMeetOp MeetOp;
+    DomainVal_t Result = MeetOp.top(DomainIdMap.size());
     for (const auto &Op : MeetOperands)
-      result = meetOp(Op, result);
-    return result;
+      Result = MeetOp(Op, Result);
+    return Result;
   }
 
   /// @}
@@ -164,8 +164,8 @@ protected:
                                llvm::FunctionAnalysisManager &FAM) {
 
     /// @done(CSCD70) Please complete this method.
-    typename TDomainElem::Initializer init{DomainIdMap, DomainVector};
-    init.visit(F);
+    typename TDomainElem::Initializer Init{DomainIdMap, DomainVector};
+    Init.visit(F);
     for (llvm::BasicBlock &BB : F) {
       for (llvm::Instruction &Inst : BB) {
         InstDomainValMap.insert({&Inst, TMeetOp().top(DomainIdMap.size())});
@@ -194,8 +194,8 @@ struct Bool {
   Bool operator|(const Bool &Other) const {
     return {.Value = Value || Other.Value};
   }
-  bool operator==(const Bool &other) const {
-    return this->Value == other.Value;
+  bool operator==(const Bool &Other) const {
+    return this->Value == Other.Value;
   }
   static Bool top() { return {.Value = true}; }
   explicit operator bool() const { return Value; }
@@ -225,10 +225,10 @@ struct Constant
         return {.ConstantType = NAC};
   }
 
-  bool operator==(const Constant &other) const
+  bool operator==(const Constant &Other) const
   {
-    if (ConstantType == other.ConstantType)
-      return (ConstantType == SC && Value != other.Value) ? false : true;
+    if (ConstantType == Other.ConstantType)
+      return (ConstantType == SC && Value != Other.Value) ? false : true;
     return false;
   }
 

@@ -4,8 +4,8 @@
 
 #include <DFA/Domain/Expression.h>
 #include <DFA/Domain/Variable.h>
-#include <DFA/Flow/ForwardAnalysis.h>
 #include <DFA/Flow/BackwardAnalysis.h>
+#include <DFA/Flow/ForwardAnalysis.h>
 #include <DFA/MeetOp.h>
 
 #include <llvm/IR/PassManager.h>

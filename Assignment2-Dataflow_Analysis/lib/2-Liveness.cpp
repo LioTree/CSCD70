@@ -11,15 +11,15 @@ bool Liveness::transferFunc(const Instruction &Inst, const DomainVal_t &IDV,
   /// @done(CSCD70) Please complete this method.
   DomainVal_t TDV = IDV;
   const Value *InstValue = dyn_cast<Value>(&Inst);
-  for (std::size_t i = 0; i < TDV.size(); i++) {
+  for (std::size_t I = 0; I < TDV.size(); I++) {
     // OUT[B] - defB
-    if (InstValue && DomainVector[i].contain(InstValue)) {
-      TDV[i] = TDV[i] & dfa::Bool();
+    if (InstValue && DomainVector[I].contain(InstValue)) {
+      TDV[I] = TDV[I] & dfa::Bool();
     }
     // useB
-    for(auto It = Inst.op_begin(); It != Inst.op_end(); It++) {
-      if(DomainVector[i].contain(*It)) {
-        TDV[i] = TDV[i] | dfa::Bool().top();
+    for(const auto *It = Inst.op_begin(); It != Inst.op_end(); It++) {
+      if(DomainVector[I].contain(*It)) {
+        TDV[I] = TDV[I] | dfa::Bool().top();
         break;
       }
     }

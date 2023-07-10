@@ -1,7 +1,7 @@
 #pragma once // NOLINT(llvm-header-guard)
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 namespace dfa {
 
@@ -27,11 +27,11 @@ template <typename TValue> struct Intersect final : MeetOpBase<TValue> {
                          const DomainVal_t &RHS) const final {
 
     /// @done(CSCD70) Please complete this method.
-    DomainVal_t result = DomainVal_t(LHS.size());
-    for(std::size_t i = 0; i < LHS.size(); i++) {
-      result[i] = LHS[i] & RHS[i];
+    DomainVal_t Result = DomainVal_t(LHS.size());
+    for(std::size_t I = 0; I < LHS.size(); I++) {
+      Result[I] = LHS[I] & RHS[I];
     }
-    return result;
+    return Result;
   }
   DomainVal_t top(const std::size_t DomainSize) const final {
 
@@ -48,11 +48,11 @@ template <typename TValue> struct Union final : MeetOpBase<TValue> {
   DomainVal_t operator()(const DomainVal_t &LHS,
                          const DomainVal_t &RHS) const final {
 
-    DomainVal_t result = DomainVal_t(LHS.size());
-    for(std::size_t i = 0; i < LHS.size(); i++) {
-      result[i] = LHS[i] | RHS[i];
+    DomainVal_t Result = DomainVal_t(LHS.size());
+    for(std::size_t I = 0; I < LHS.size(); I++) {
+      Result[I] = LHS[I] | RHS[I];
     }
-    return result;
+    return Result;
   }
   DomainVal_t top(const std::size_t DomainSize) const final {
     return DomainVal_t(DomainSize);
