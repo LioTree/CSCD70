@@ -17,10 +17,18 @@ bool Liveness::transferFunc(const Instruction &Inst, const DomainVal_t &IDV,
       TDV[i] = TDV[i] & dfa::Bool();
     }
     // useB
+    for(auto It = Inst.op_begin(); It != Inst.op_end(); It++) {
+      if(DomainVector[i].contain(*It)) {
+        TDV[i] = TDV[i] | dfa::Bool().top();
+        break;
+      }
+    }
+    /*
     if (DomainVector[i].contain(Inst.getOperand(0)) ||
         DomainVector[i].contain(Inst.getOperand(1))) {
       TDV[i] = TDV[i] | dfa::Bool().top();
     }
+    */
   }
   if (TDV == ODV)
     return false;
