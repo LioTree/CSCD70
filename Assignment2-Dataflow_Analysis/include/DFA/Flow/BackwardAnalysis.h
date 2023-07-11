@@ -42,7 +42,7 @@ protected:
   using Framework_t::run;
   using Framework_t::stringifyDomainWithMask;
 
-  void printInstDomainValMap(const llvm::Instruction &Inst) const final {
+  virtual void printInstDomainValMap(const llvm::Instruction &Inst) const final override {
     using llvm::errs;
     using llvm::outs;
     const llvm::BasicBlock *const ParentBB = Inst.getParent();
@@ -58,18 +58,18 @@ protected:
     } // if (&Inst == &(*ParentBB->back()))
   }
 
-  MeetBBConstRange_t
-  getMeetBBConstRange(const llvm::BasicBlock &BB) const final {
+  virtual MeetBBConstRange_t
+  getMeetBBConstRange(const llvm::BasicBlock &BB) const final override {
     return llvm::successors(&BB);
   }
-  InstConstRange_t getInstConstRange(const llvm::BasicBlock &BB) const final {
+  virtual InstConstRange_t getInstConstRange(const llvm::BasicBlock &BB) const final override {
     return make_range(BB.rbegin(), BB.rend());
   }
-  BBConstRange_t getBBConstRange(const llvm::Function &F) const final {
+  virtual BBConstRange_t getBBConstRange(const llvm::Function &F) const final override {
     return llvm::reverse(F);
   }
   // this method should be in Liveness, but it's more convenient to put it here
-  MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
+  virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const override {
     MeetOperands_t Operands;
 
     MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);

@@ -14,10 +14,10 @@ void Variable::Initializer::visitInstruction(Instruction &I) {
   /// @done(CSCD70) Please complete this method.
   for(const auto &Op : I.operands()) {
     if (isa<Instruction>(Op) || isa<Argument>(Op)) {
-      Variable var{Op};
-      if(DomainIdMap.find(var) == DomainIdMap.end()) {
-        DomainVector.push_back(var);
-        DomainIdMap.insert(std::make_pair(var, DomainVector.size() - 1));
+      Variable Var{Op};
+      if(DomainIdMap.find(Var) == DomainIdMap.end()) {
+        DomainVector.push_back(Var);
+        DomainIdMap.insert(std::make_pair(Var, DomainVector.size() - 1));
       }
     }
   }

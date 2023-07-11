@@ -233,6 +233,15 @@ struct Constant
   }
 
   static Constant top() { return {}; }
+  explicit operator bool() const { return false; }
+  explicit operator std::string() const {
+    if(ConstantType == UNDEF)
+      return "UNDEF";
+    else if(ConstantType == NAC)
+      return "NAC";
+    else
+      return std::to_string(Value);
+  }
 };
 
 } // namespace dfa

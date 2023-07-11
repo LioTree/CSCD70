@@ -9,6 +9,9 @@
 #include <DFA/MeetOp.h>
 
 #include <llvm/IR/PassManager.h>
+#include <map>
+#include <utility>
+#include <vector>
 
 class AvailExprs final : public dfa::ForwardAnalysis<dfa::Expression, dfa::Bool,
                                                      dfa::Intersect<dfa::Bool>>,
@@ -20,9 +23,9 @@ private:
   friend llvm::AnalysisInfoMixin<AvailExprs>;
   static llvm::AnalysisKey Key;
 
-  std::string getName() const final { return "AvailExprs"; }
-  bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
-                    DomainVal_t &) final;
+  virtual std::string getName() const override { return "AvailExprs"; }
+  virtual bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
+                            DomainVal_t &) override;
 
 public:
   using Result = typename ForwardAnalysis_t::AnalysisResult_t;
@@ -40,18 +43,18 @@ public:
 };
 
 class Liveness final : public dfa::BackwardAnalysis<dfa::Variable, dfa::Bool,
-                                                     dfa::Union<dfa::Bool>>,
-                         public llvm::AnalysisInfoMixin<Liveness> {
+                                                    dfa::Union<dfa::Bool>>,
+                       public llvm::AnalysisInfoMixin<Liveness> {
 private:
-  using BackwardAnalysis_t = dfa::BackwardAnalysis<dfa::Variable, dfa::Bool,
-                                                 dfa::Union<dfa::Bool>>;
+  using BackwardAnalysis_t =
+      dfa::BackwardAnalysis<dfa::Variable, dfa::Bool, dfa::Union<dfa::Bool>>;
 
   friend llvm::AnalysisInfoMixin<Liveness>;
   static llvm::AnalysisKey Key;
 
-  std::string getName() const final { return "Liveness"; }
-  bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
-                    DomainVal_t &) final;
+  virtual std::string getName() const override { return "Liveness"; }
+  virtual bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
+                            DomainVal_t &) override;
 
 public:
   using Result = typename BackwardAnalysis_t::AnalysisResult_t;
@@ -71,13 +74,41 @@ public:
   }
 };
 
+class SCCP final : public dfa::ForwardAnalysis<dfa::Variable, dfa::Constant,
+                                               dfa::Intersect<dfa::Constant>>,
+                   public llvm::AnalysisInfoMixin<SCCP> {
+private:
+  using ForwardAnalysis_t = dfa::ForwardAnalysis<dfa::Variable, dfa::Constant,
+                                                 dfa::Intersect<dfa::Constant>>;
+  using ForwardAnalysis_t::printInstDomainValMap;
+
+  friend llvm::AnalysisInfoMixin<SCCP>;
+  static llvm::AnalysisKey Key;
+  std::map<std::pair<llvm::BasicBlock *, llvm::BasicBlock *>, bool>
+  ExecFlags;
+  std::map<llvm::BasicBlock *, bool> BBExecFlags;
+  std::vector<std::pair<llvm::BasicBlock *,llvm::BasicBlock *>> FlowWL;
+  std::vector<llvm::Instruction *> SSAWL;
+
+  virtual std::string getName() const override { return "SCCP"; }
+  virtual bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
+                            DomainVal_t &) override;
+  virtual void
+  printInstDomainValMap(const llvm::Instruction &Inst) const override;
+
+public:
+  using Result = typename ForwardAnalysis_t::AnalysisResult_t;
+  virtual Result run(llvm::Function &F,
+                     llvm::FunctionAnalysisManager &FAM) override;
+};
+
 class SCCPWrapperPass : public llvm::PassInfoMixin<SCCPWrapperPass> {
 public:
   llvm::PreservedAnalyses run(llvm::Function &F,
                               llvm::FunctionAnalysisManager &FAM) {
 
-    /// @todo(CSCD70) Get the result from the main body.
-
+    /// @done(CSCD70) Get the result from the main body.
+    FAM.getResult<SCCP>(F);
     return llvm::PreservedAnalyses::all();
   }
 };

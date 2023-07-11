@@ -36,8 +36,9 @@ protected:
   using Framework_t::getName;
   using Framework_t::run;
   using Framework_t::stringifyDomainWithMask;
+  using Framework_t::printInstDomainValMap;
 
-  void printInstDomainValMap(const llvm::Instruction &Inst) const final {
+  virtual void printInstDomainValMap(const llvm::Instruction &Inst) const override {
     using llvm::errs;
     using llvm::outs;
     const llvm::BasicBlock *const ParentBB = Inst.getParent();
@@ -52,17 +53,17 @@ protected:
                       << stringifyDomainWithMask(InstDomainValMap.at(&Inst));
   }
 
-  MeetBBConstRange_t
-  getMeetBBConstRange(const llvm::BasicBlock &BB) const final {
+  virtual MeetBBConstRange_t
+  getMeetBBConstRange(const llvm::BasicBlock &BB) const final override {
     return llvm::predecessors(&BB);
   }
-  InstConstRange_t getInstConstRange(const llvm::BasicBlock &BB) const final {
+  virtual InstConstRange_t getInstConstRange(const llvm::BasicBlock &BB) const final override {
     return make_range(BB.begin(), BB.end());
   }
-  BBConstRange_t getBBConstRange(const llvm::Function &F) const final {
+  virtual BBConstRange_t getBBConstRange(const llvm::Function &F) const final override {
     return make_range(F.begin(), F.end());
   }
-  MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const {
+  virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const override {
     MeetOperands_t Operands;
 
     /// @done(CSCD70) Please complete this method.
