@@ -68,8 +68,8 @@ protected:
 
     /// @done(CSCD70) Please complete this method.
     MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
-    for (const llvm::BasicBlock *BB : MeetBBConstRange) {
-      Operands.push_back(InstDomainValMap.at(&(BB->back())));
+    for (const llvm::BasicBlock *MeetBB : MeetBBConstRange) {
+      Operands.push_back(InstDomainValMap.at(&(MeetBB->back())));
     }
     return Operands;
   }
