@@ -79,7 +79,7 @@ SCCP::Result SCCP::run(Function &F, FunctionAnalysisManager &FAM) {
   return std::make_tuple(DomainIdMap, DomainVector, BVs, InstDomainValMap);
 }
 
-dfa::Constant SCCP::getConstant(const Value *V) const {
+dfa::Constant SCCP::convertValue2Constant(const Value *V) const {
   const ConstantInt *CI = dyn_cast<ConstantInt>(V);
   if (CI != nullptr) {
     dfa::Constant Result;
@@ -98,7 +98,7 @@ void SCCP::visitPhi(const PHINode &Phi) {
     if (ExecFlags.find(std::make_pair(Phi.getIncomingBlock(i),
                                       Phi.getParent())) != ExecFlags.end()) {
       Value *IncomingValue = Phi.getIncomingValue(i);
-      dfa::Constant LatCellUk = getConstant(IncomingValue);
+      dfa::Constant LatCellUk = convertValue2Constant(IncomingValue);
       /*
       ConstantInt *IncomingConstant = dyn_cast<ConstantInt>(IncomingValue);
       if (IncomingConstant != nullptr) {
@@ -156,5 +156,28 @@ void SCCP::visitBranch(const BranchInst *BI) {
 }
 
 void SCCP::visitIcmp(const llvm::ICmpInst *CI) {
-  // dfa::Variable
+  if (CI->isLT(CI->getPredicate())) {
+    dfa::Constant LHS = convertValue2Constant(CI->getOperand(0));
+    dfa::Constant RHS = convertValue2Constant(CI->getOperand(1));
+    dfa::Constant Result;
+    if (LHS.ConstantType == dfa::NAC || RHS.ConstantType == dfa::NAC) {
+      Result.ConstantType = dfa::NAC;
+    } else {
+      Result.ConstantType = dfa::SC;
+      if (LHS.Value < RHS.Value)
+        Result.Value = 1;
+      else
+        Result.Value = 0;
+    }
+    if (Result != LatCells[dfa::Variable(CI)]) {
+      LatCells[dfa::Variable(CI)] = Result;
+      // add SSAOutEdges(CI) to SSAWL
+      for (auto &U : CI->uses()) {
+        Instruction *I = dyn_cast<Instruction>(U.getUser());
+        if (I) {
+          SSAWL.push({CI, I});
+        }
+      }
+    }
+  }
 }

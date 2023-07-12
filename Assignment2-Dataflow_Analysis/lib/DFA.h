@@ -101,7 +101,7 @@ private:
   void visitInstruction(const llvm::Instruction &Inst);
   void visitBranch(const llvm::BranchInst *BI);
   void visitIcmp(const llvm::ICmpInst *CI);
-  dfa::Constant getConstant(const llvm::Value *V) const;
+  dfa::Constant convertValue2Constant(const llvm::Value *V) const;
 
 public:
   using Result = typename ForwardAnalysis_t::AnalysisResult_t;
