@@ -16,6 +16,7 @@ struct Variable final : DomainBase<Variable> {
   Variable(const llvm::Value *const Var) : Var(Var) {}
 
   bool operator==(const Variable &Other) const { return Var == Other.Var; }
+  bool operator<(const Variable &Other) const { return Var < Other.Var; }
 
   bool contain(const llvm::Value *const Val) const final {
 

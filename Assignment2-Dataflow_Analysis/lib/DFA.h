@@ -12,6 +12,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <queue>
 
 class AvailExprs final : public dfa::ForwardAnalysis<dfa::Expression, dfa::Bool,
                                                      dfa::Intersect<dfa::Bool>>,
@@ -84,17 +85,23 @@ private:
 
   friend llvm::AnalysisInfoMixin<SCCP>;
   static llvm::AnalysisKey Key;
-  std::map<std::pair<llvm::BasicBlock *, llvm::BasicBlock *>, bool>
+  std::map<std::pair<const llvm::BasicBlock *, const llvm::BasicBlock *>, bool>
   ExecFlags;
-  std::map<llvm::BasicBlock *, bool> BBExecFlags;
-  std::vector<std::pair<llvm::BasicBlock *,llvm::BasicBlock *>> FlowWL;
-  std::vector<llvm::Instruction *> SSAWL;
+  std::map<const llvm::BasicBlock *, bool> BBExecFlags;
+  std::map<dfa::Variable, dfa::Constant> LatCells;
+  std::queue<std::pair<const llvm::BasicBlock *,const llvm::BasicBlock *>> FlowWL;
+  std::queue<std::pair<const llvm::Instruction *,const llvm::Instruction *>> SSAWL;
 
   virtual std::string getName() const override { return "SCCP"; }
   virtual bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
                             DomainVal_t &) override;
   virtual void
   printInstDomainValMap(const llvm::Instruction &Inst) const override;
+  void visitPhi(const llvm::PHINode &Phi);
+  void visitInstruction(const llvm::Instruction &Inst);
+  void visitBranch(const llvm::BranchInst *BI);
+  void visitIcmp(const llvm::ICmpInst *CI);
+  dfa::Constant getConstant(const llvm::Value *V) const;
 
 public:
   using Result = typename ForwardAnalysis_t::AnalysisResult_t;

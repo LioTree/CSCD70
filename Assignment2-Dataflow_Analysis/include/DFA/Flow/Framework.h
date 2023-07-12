@@ -232,6 +232,11 @@ struct Constant
     return false;
   }
 
+  bool operator!=(const Constant &Other) const
+  {
+    return !(*this == Other);
+  }
+
   static Constant top() { return {}; }
   explicit operator bool() const { return false; }
   explicit operator std::string() const {
