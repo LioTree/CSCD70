@@ -101,6 +101,7 @@ private:
   void visitInstruction(const llvm::Instruction &Inst);
   void visitBranch(const llvm::BranchInst *BI);
   void visitIcmp(const llvm::ICmpInst *CI);
+  void visitBinaryOperator(const llvm::BinaryOperator *BO);
   dfa::Constant convertValue2Constant(const llvm::Value *V) const;
 
 public:
