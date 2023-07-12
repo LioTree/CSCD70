@@ -5,6 +5,7 @@ using namespace llvm;
 
 AnalysisKey SCCP::Key;
 
+// useless for SCCP
 void SCCP::printInstDomainValMap(const Instruction &Inst) const {
   outs() << Inst << "\n";
   int I = 0;

@@ -1,6 +1,6 @@
 ; RUN: opt -S -load-pass-plugin=%dylibdir/libDFA.so \
 ; RUN:     -p=const-prop %s -o %basename_t 2>%basename_t.log
-; @todo(CSCD70): FileCheck --match-full-lines %s --input-file=%basename_t.log
+; @done(CSCD70): FileCheck --match-full-lines %s --input-file=%basename_t.log
 
 ; int Loop() {
 ;   int i = 1, j = 1;
@@ -15,7 +15,15 @@
 ;   }
 ;   return j;
 ; }
-; @todo(CSCD70) Please complete the CHECK directives.
+; @done(CSCD70) Please complete the CHECK directives.
+; CHECK: Variable: i1 %2 NAC
+; CHECK: Variable: i1 %4 1
+; CHECK: Variable: i32 %6 NAC
+; CHECK: Variable: i32 %8 UNDEF
+; CHECK: Variable: i32 %.01 1
+; CHECK: Variable: i32 %.0 NAC
+; CHECK: Variable: i32 %.12 1
+; CHECK: Variable: i32 %.1 NAC
 define i32 @Loop() {
   br label %1
 
