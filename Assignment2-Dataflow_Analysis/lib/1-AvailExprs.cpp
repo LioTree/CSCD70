@@ -25,7 +25,7 @@ bool AvailExprs::transferFunc(const Instruction &Inst, const DomainVal_t &IDV,
   }
   if(TDV == ODV)
     return false;
-  InstDomainValMap[&Inst] = TDV;
+  ODV = TDV;
   return true;
 }
 
