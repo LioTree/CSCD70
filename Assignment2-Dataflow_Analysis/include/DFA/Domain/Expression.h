@@ -24,26 +24,32 @@ struct Expression final : DomainBase<Expression> {
   bool operator==(const Expression &Other) const final {
 
     /// @done(CSCD70) Please complete this method.
-    if(Other.Opcode == Opcode) 
-      return (LHS == Other.LHS && RHS == Other.RHS) || (LHS == Other.RHS && RHS == Other.LHS);
+    if (Other.Opcode == Opcode)
+      return (LHS == Other.LHS && RHS == Other.RHS) ||
+             (LHS == Other.RHS && RHS == Other.LHS);
     return false;
+  }
+
+  bool operator<(const Expression &Other) const {
+    return Opcode < Other.Opcode && LHS < Other.LHS && RHS < Other.RHS;
   }
 
   bool contain(const llvm::Value *const Val) const final {
 
     /// @done(CSCD70) Please complete this method.
-    if(Val == LHS || Val == RHS)
+    if (Val == LHS || Val == RHS)
       return true;
 
     return false;
   }
+
   Expression replaceValueWith(const llvm::Value *const SrcVal,
                               const llvm::Value *const DstVal) const final {
 
-    /// @todo(CSCD70) Please complete this method.
-    // Still not sure what this function should does
-
-    return *this;
+    /// @done(CSCD70) Please complete this method.
+    const llvm::Value *const newLHS = (SrcVal == LHS) ? DstVal : LHS;
+    const llvm::Value *const newRHS = (SrcVal == RHS) ? DstVal : RHS;
+    return Expression{Opcode, newLHS, newRHS};
   }
 
   using DomainBase<Expression>::DomainIdMap_t;
@@ -70,7 +76,8 @@ template <> struct hash<::dfa::Expression> {
     size_t HashVal = 0;
 
     /// @done(CSCD70) Please complete this method.
-    hashCombine<unsigned,const llvm::Value *,const llvm::Value *>(&HashVal, Expr.Opcode, Expr.LHS, Expr.RHS);
+    hashCombine<unsigned, const llvm::Value *, const llvm::Value *>(
+        &HashVal, Expr.Opcode, Expr.LHS, Expr.RHS);
     return HashVal;
   }
 };

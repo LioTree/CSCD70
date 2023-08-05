@@ -17,6 +17,7 @@ extern "C" PassPluginLibraryInfo llvmGetPassPluginInfo() {
                   FAM.registerPass([&]() { return AvailExprs(); });
                   FAM.registerPass([&]() { return Liveness(); });
                   FAM.registerPass([&]() { return SCCP(); });
+                  FAM.registerPass([&]() { return AnticipatedExprs(); });
                   /// @todo(CSCD70) Please complete the registration of other
                   ///               passes.
                 });

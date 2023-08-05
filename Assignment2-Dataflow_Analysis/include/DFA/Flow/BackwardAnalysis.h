@@ -67,39 +67,7 @@ protected:
   }
   virtual BBConstRange_t getBBConstRange(const llvm::Function &F) const final override {
     return llvm::reverse(F);
-  }
-  // this method should be in Liveness, but it's more convenient to put it here
-  virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const override {
-    MeetOperands_t Operands;
-
-    MeetBBConstRange_t MeetBBConstRange = getMeetBBConstRange(BB);
-    for (const llvm::BasicBlock *MeetBB : MeetBBConstRange) {
-      DomainVal_t DV = InstDomainValMap.at(&(MeetBB->front()));
-
-      /*
-      phi instructions requires special consideration.
-      For example, in 2-Liveness.ll:
-        BB3 has two predecessors(BB2 and BB7), and it has two phi instructions:
-          %.01 = phi i32 [ 1, %2 ], [ %6, %7 ]
-          %.0 = phi i32 [ %0, %2 ], [ %8, %7 ]
-        which means if %0 is alive in INPUT[BB3], this information should only be propagated to BB2 instead of BB7.
-        similarly, if %6 is alive in INPUT[BB3], this information should only be propagated to BB7 instead of BB2.
-      */
-      for (auto &Phi : MeetBB->phis()) {
-        for (auto &PhiIncomingBlock : Phi.blocks()) {
-
-          if (&BB != PhiIncomingBlock) {
-            auto It = std::find(DomainVector.begin(), DomainVector.end(),
-                                Phi.getIncomingValueForBlock(PhiIncomingBlock));
-            int Index = std::distance(DomainVector.begin(), It);
-            DV[Index] = DV[Index] & TValue();
-          }
-        }
-      }
-      Operands.push_back(DV);
-    }
-    return Operands;
-  }
+  } 
 };
 
 } // namespace dfa

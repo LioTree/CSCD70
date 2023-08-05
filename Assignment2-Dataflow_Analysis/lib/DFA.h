@@ -49,6 +49,8 @@ class Liveness final : public dfa::BackwardAnalysis<dfa::Variable, dfa::Bool,
 private:
   using BackwardAnalysis_t =
       dfa::BackwardAnalysis<dfa::Variable, dfa::Bool, dfa::Union<dfa::Bool>>;
+  using typename BackwardAnalysis_t::MeetBBConstRange_t;
+  using typename BackwardAnalysis_t::MeetOperands_t;
 
   friend llvm::AnalysisInfoMixin<Liveness>;
   static llvm::AnalysisKey Key;
@@ -56,6 +58,7 @@ private:
   virtual std::string getName() const override { return "Liveness"; }
   virtual bool transferFunc(const llvm::Instruction &, const DomainVal_t &,
                             DomainVal_t &) override;
+  virtual MeetOperands_t getMeetOperands(const llvm::BasicBlock &BB) const override;
 
 public:
   using Result = typename BackwardAnalysis_t::AnalysisResult_t;
