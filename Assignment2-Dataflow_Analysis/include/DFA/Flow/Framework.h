@@ -51,6 +51,7 @@ protected:
       if (!static_cast<bool>(Mask[DomainId])) {
         continue;
       }
+      // need to recover after debugging
       Strout << DomainVector.at(DomainId)
              << ValuePrinter<TValue>::print(Mask[DomainId]) << ", ";
     } // for (MaskIdx : [0, Mask.size()))

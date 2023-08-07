@@ -27,13 +27,6 @@ bool AnticipatedExprs::transferFunc(const Instruction &Inst,
   return true;
 }
 
-const Value *AnticipatedExprs::getRealValue(const Value *Val) const {
-  if (PhiMap.find(Val) != PhiMap.end())
-    return getRealValue(PhiMap.at(Val));
-  else
-    return Val;
-}
-
 AnticipatedExprs::MeetOperands_t
 AnticipatedExprs::getMeetOperands(const BasicBlock &BB) const {
   MeetOperands_t Operands;
@@ -48,18 +41,7 @@ AnticipatedExprs::getMeetOperands(const BasicBlock &BB) const {
 
 AnticipatedExprs::Result AnticipatedExprs::run(Function &F,
                                                FunctionAnalysisManager &FAM) {
-  for(auto &BB : F) {
-    for (llvm::Instruction &Inst : BB) {
-      const PHINode *PHI = dyn_cast<const PHINode>(&Inst);
-      if(PHI) {
-        const Value *PHIVal = dyn_cast<const Value>(&Inst);
-        for (unsigned I = 0; I < PHI->getNumIncomingValues(); I++) {
-          const Value *Val = PHI->getIncomingValue(I);
-          PhiMap.insert(std::make_pair(Val, PHIVal));
-        }
-      }
-    }
-  }
+  initPhiMap(F);
   
   for(auto &BB : F) {
     for (llvm::Instruction &Inst : BB) {
