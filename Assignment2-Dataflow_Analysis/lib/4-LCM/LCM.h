@@ -7,8 +7,6 @@
 #include <llvm/IR/Function.h>
 #include <llvm/IR/PassManager.h>
 #include <map>
-#include <vector>
-#include <set>
 
 class AnticipatedExprs final
     : public dfa::BackwardAnalysis<dfa::Expression, dfa::Bool,
@@ -19,6 +17,7 @@ private:
                                                    dfa::Intersect<dfa::Bool>>;
   using typename BackwardAnalysis_t::MeetBBConstRange_t;
   using typename BackwardAnalysis_t::MeetOperands_t;
+  using typename BackwardAnalysis_t::Framework_t;
 
   friend llvm::AnalysisInfoMixin<AnticipatedExprs>;
   static llvm::AnalysisKey Key;
@@ -27,10 +26,14 @@ private:
                             DomainVal_t &) override;
   virtual MeetOperands_t
   getMeetOperands(const llvm::BasicBlock &BB) const override;
+  std::map<const llvm::Value *, const llvm::Value *> PhiMap;
+  const llvm::Value * getRealValue(const llvm::Value *Val) const;
 
 public:
   using Result = typename BackwardAnalysis_t::AnalysisResult_t;
-  using BackwardAnalysis_t::run;
+  // using BackwardAnalysis_t::run;
+  virtual Result run(llvm::Function &F,
+                     llvm::FunctionAnalysisManager &FAM) override;
 };
 
 class LCMWrapperPass : public llvm::PassInfoMixin<LCMWrapperPass> {
